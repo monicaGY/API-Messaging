@@ -45,6 +45,8 @@ return [
                  */
                 'annotations' => [
                     base_path('app'),
+                    base_path('src/Conversation/Infrastructure/Entrypoint/Http'),
+
                 ],
             ],
         ],

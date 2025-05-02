@@ -119,12 +119,113 @@
                     }
                 }
             }
+        },
+        "/api/v1/conversations/{id}": {
+            "get": {
+                "tags": [
+                    "Conversation"
+                ],
+                "summary": "Get conversation by ID",
+                "operationId": "a78f02af89784c0a564c9624aec06eb3",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID conversation",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Conversation successfully obtained",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "conversation": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 2
+                                                    },
+                                                    "messages": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "integer",
+                                                                    "example": 1
+                                                                },
+                                                                "message": {
+                                                                    "type": "string",
+                                                                    "example": "Hello Juan!"
+                                                                },
+                                                                "user": {
+                                                                    "properties": {
+                                                                        "id": {
+                                                                            "type": "integer",
+                                                                            "example": 1
+                                                                        },
+                                                                        "name": {
+                                                                            "type": "string",
+                                                                            "example": "Pablo"
+                                                                        }
+                                                                    },
+                                                                    "type": "object"
+                                                                },
+                                                                "date": {
+                                                                    "type": "string",
+                                                                    "format": "date-time",
+                                                                    "example": "2025-04-24 18:32:00"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Conversación no encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Conversation not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "tags": [
         {
             "name": "Authentication",
             "description": "Authentication"
+        },
+        {
+            "name": "Conversation",
+            "description": "Conversation"
         }
     ]
 }

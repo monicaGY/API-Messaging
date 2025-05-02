@@ -22,11 +22,8 @@ class TransformerGetConversation
     }
     private function formatConversation($conversations)
     {
-        return $conversations->map(function ( $item) {
-            return (new Conversation(
-                $item->id,
-                new Messages($item->messages)
-            ));
+        return $conversations->map(function ($item) {
+            return $item->toArray();
         });
     }
 }

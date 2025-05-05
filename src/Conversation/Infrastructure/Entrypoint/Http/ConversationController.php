@@ -10,6 +10,14 @@ use Conversation\Infrastructure\Persistence\Mongo\MongoConversationRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * @OA\SecurityScheme(
+ *     securityScheme="bearerAuth",
+ *     type="http",
+ *     scheme="bearer",
+ *     bearerFormat="JWT"
+ * )
+ */
 class ConversationController extends Controller
 {
     /**
@@ -38,6 +46,7 @@ class ConversationController extends Controller
      *     path="/api/v1/conversations/{id}",
      *     tags={"Conversation"},
      *     summary="Get conversation by ID",
+     *          security={{"bearerAuth":{}}},
      *          @OA\Parameter(
      *          name="id",
      *          in="path",
@@ -81,7 +90,11 @@ class ConversationController extends Controller
      *          @OA\JsonContent(
      *              @OA\Property(property="message", type="string", example="Conversation not found")
      *          )
-     *      )
+     *      ),
+     *     @OA\Response(
+     *           response=403,
+     *           description="You are not part of this group"
+     *       )
      * )
      */
     public function show(int $id): JsonResponse

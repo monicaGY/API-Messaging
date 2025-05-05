@@ -191,12 +191,8 @@ class MessageController extends Controller
      *         description="Invalid credentials"
      *     ),
      *     @OA\Response(
-     *           response=403,
-     *           description="You are not part of this group"
-     *       ),
-     *     @OA\Response(
      *            response=403,
-     *            description="Action not allowed: only the author of the message can edit it"
+     *            description="Forbidden: You are not part of this group or only the author can edit the message"
      *        )
      * )
      */

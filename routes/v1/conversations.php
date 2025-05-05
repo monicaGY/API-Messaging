@@ -9,6 +9,7 @@ use Message\Infrastructure\Entrypoint\Http\MessageController;
 Route::middleware('auth:sanctum')
     ->prefix('/v1/conversations')
     ->group( function () {
+        Route::get('/', [ConversationController::class, 'index']);
 
         Route::prefix('{id}')
             ->middleware('conversation.check.user')

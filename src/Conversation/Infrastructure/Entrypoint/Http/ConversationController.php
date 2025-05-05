@@ -4,7 +4,10 @@ namespace Conversation\Infrastructure\Entrypoint\Http;
 
 use App\Http\Controllers\Controller;
 use Conversation\Application\Handler\GetConversationHandler;
+use Conversation\Application\Handler\GetConversationsHandler;
 use Conversation\Application\Transformer\TransformerGetConversation;
+use Conversation\Application\Transformer\TransformerGetConversations;
+use Conversation\Domain\UseCase\GetConversationsUseCase;
 use Conversation\Domain\UseCase\GetConversationUseCase;
 use Conversation\Infrastructure\Persistence\Mongo\MongoConversationRepository;
 use Illuminate\Http\JsonResponse;
@@ -21,16 +24,50 @@ use Illuminate\Http\Request;
 class ConversationController extends Controller
 {
     /**
-     * @OA\PathItem(
-     *     path="/api/v1/conversations"
+     * @OA\Get (
+     *     path="/api/v1/conversations",
+     *     tags={"Conversation"},
+     *     summary="Get all conversations",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *          response=200,
+     *          description="List conversations successfully obtained",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                  property="conversations",
+     *                  type="array",
+     *                  @OA\Items(
+     *                      @OA\Property(property="id", type="integer", example=2),
+     *                      @OA\Property(property="is_group", type="boolean", example=false),
+     *                      @OA\Property(
+     *                          property="participants",
+     *                          type="array",
+     *                          @OA\Items(
+     *                              @OA\Property(property="id", type="integer", example=1),
+     *                              @OA\Property(property="name", type="string", example="Sebastian García")
+     *                          ),
+     *
+     *                      ),
+     *                      @OA\Property(
+     *                          property="date_created",
+     *                          type="string",
+     *                          format="date-time",
+     *                          example="2025-04-24 18:00:00"
+     *                      )
+     *                  )
+     *              )
+     *          )
+     *      ),
      * )
      */
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): JsonResponse
     {
-        //
+        return (new GetConversationsHandler(
+            new GetConversationsUseCase(
+                new MongoConversationRepository()
+            ),
+            new TransformerGetConversations()
+        ))->handle();
     }
 
     /**

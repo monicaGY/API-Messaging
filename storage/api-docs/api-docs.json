@@ -120,6 +120,71 @@
                 }
             }
         },
+        "/api/v1/conversations": {
+            "get": {
+                "tags": [
+                    "Conversation"
+                ],
+                "summary": "Get all conversations",
+                "operationId": "29a4cbeccff8530c977b1d981192164b",
+                "responses": {
+                    "200": {
+                        "description": "List conversations successfully obtained",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "conversations": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 2
+                                                    },
+                                                    "is_group": {
+                                                        "type": "boolean",
+                                                        "example": false
+                                                    },
+                                                    "participants": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "integer",
+                                                                    "example": 1
+                                                                },
+                                                                "name": {
+                                                                    "type": "string",
+                                                                    "example": "Sebastian García"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "date_created": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2025-04-24 18:00:00"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/conversations/{id}": {
             "get": {
                 "tags": [
@@ -447,7 +512,7 @@
                         "description": "Invalid credentials"
                     },
                     "403": {
-                        "description": "You are not part of this group"
+                        "description": "Forbidden: You are not part of this group or only the author can edit the message"
                     }
                 },
                 "security": [

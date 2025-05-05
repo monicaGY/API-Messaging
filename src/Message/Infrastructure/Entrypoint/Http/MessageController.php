@@ -11,8 +11,7 @@ use Message\Application\Handler\AddMessageHandler;
 use Message\Application\Handler\UpdateMessageHandler;
 use Message\Domain\UseCase\AddMessageUseCase;
 use Message\Domain\UseCase\UpdateMessageUseCase;
-use Message\Infrastructure\Entrypoint\Http\Request\AddMessageRequest;
-use Message\Infrastructure\Entrypoint\Http\Request\UpdateMessageRequest;
+use Message\Infrastructure\Entrypoint\Http\Request\MessageRequest;
 use Message\Infrastructure\Persistence\Mongo\MongoMesssageRepository;
 
 class MessageController extends Controller
@@ -34,9 +33,70 @@ class MessageController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @OA\Post(
+     *     path="/api/v1/conversations/{id}/messages",
+     *     tags={"Message"},
+     *     summary="Add message by conversation ID",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *           name="id",
+     *           in="path",
+     *           required=true,
+     *           description="ID conversation",
+     *           @OA\Schema(type="integer", example=1)
+     *       ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *              mediaType="application/json",
+     *              @OA\Schema(
+     *                  type="object",
+     *                  required={"message"},
+     *                  @OA\Property(property="message", type="string", example="Hello how are you?"),
+     *              )
+     *          )
+     *     ),
+     *     @OA\Response(
+     *            response=200,
+     *            description="Message edit",
+     *            @OA\JsonContent(
+     *                @OA\Property(
+     *                    property="conversation",
+     *                    type="array",
+     *                    @OA\Items(
+     *                        type="object",
+     *                        @OA\Property(property="id", type="integer", example=1),
+     *                        @OA\Property(
+     *                            property="messages",
+     *                            type="array",
+     *                            @OA\Items(
+     *                                type="object",
+     *                                @OA\Property(property="id", type="integer", example=1),
+     *                                @OA\Property(property="message", type="string", example="Hello how are you"),
+     *                                @OA\Property(
+     *                                    property="user",
+     *                                    type="object",
+     *                                    @OA\Property(property="id", type="integer", example=3),
+     *                                    @OA\Property(property="name", type="string", example="Pablo")
+     *                                ),
+     *                                @OA\Property(property="date", type="string", format="date-time", example="2025-04-24 18:32:00")
+     *                            )
+     *                        )
+     *                    )
+     *                )
+     *            )
+     *        ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Invalid credentials"
+     *     ),
+     * @OA\Response(
+     *          response=403,
+     *          description="You are not part of this group"
+     *      )
+     * )
      */
-    public function store(AddMessageRequest $request, $conversationId): JsonResponse
+    public function store(MessageRequest $request, $conversationId): JsonResponse
     {
         return (new AddMessageHandler(
             new AddMessageUseCase(
@@ -66,9 +126,81 @@ class MessageController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * @OA\Put(
+     *     path="/api/v1/conversations/{id}/messages/{messageId}",
+     *     tags={"Message"},
+     *     summary="Edit a message in a conversation",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *           name="id",
+     *           in="path",
+     *           required=true,
+     *           description="ID conversation",
+     *           @OA\Schema(type="integer", example=1)
+     *       ),
+     *     @OA\Parameter(
+     *           name="messageId",
+     *           in="path",
+     *           required=true,
+     *           description="ID message",
+     *           @OA\Schema(type="integer", example=1)
+     *       ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *              mediaType="application/json",
+     *              @OA\Schema(
+     *                  type="object",
+     *                  required={"message"},
+     *                  @OA\Property(property="message", type="string", example="Hi where are you?"),
+     *              )
+     *          )
+     *     ),
+     *     @OA\Response(
+     *           response=200,
+     *           description="Message edit",
+     *           @OA\JsonContent(
+     *               @OA\Property(
+     *                   property="conversation",
+     *                   type="array",
+     *                   @OA\Items(
+     *                       type="object",
+     *                       @OA\Property(property="id", type="integer", example=1),
+     *                       @OA\Property(
+     *                           property="messages",
+     *                           type="array",
+     *                           @OA\Items(
+     *                               type="object",
+     *                               @OA\Property(property="id", type="integer", example=1),
+     *                               @OA\Property(property="message", type="string", example="Hi where are you"),
+     *                               @OA\Property(
+     *                                   property="user",
+     *                                   type="object",
+     *                                   @OA\Property(property="id", type="integer", example=3),
+     *                                   @OA\Property(property="name", type="string", example="Pablo")
+     *                               ),
+     *                               @OA\Property(property="date", type="string", format="date-time", example="2025-04-24 18:32:00")
+     *                           )
+     *                       )
+     *                   )
+     *               )
+     *           )
+     *       ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Invalid credentials"
+     *     ),
+     *     @OA\Response(
+     *           response=403,
+     *           description="You are not part of this group"
+     *       ),
+     *     @OA\Response(
+     *            response=403,
+     *            description="Action not allowed: only the author of the message can edit it"
+     *        )
+     * )
      */
-    public function update(UpdateMessageRequest $request, $conversationId): JsonResponse
+    public function update(MessageRequest $request, $conversationId, $messageId): JsonResponse
     {
         return (new UpdateMessageHandler(
             new UpdateMessageUseCase(
@@ -78,7 +210,7 @@ class MessageController extends Controller
                 new MongoConversationRepository()
             ),
             new TransformerGetConversation()
-        ))->handle($conversationId, $request);
+        ))->handle($conversationId, $messageId, $request['message']);
     }
 
     /**

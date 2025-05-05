@@ -16,14 +16,11 @@ class MongoMesssageRepository implements MesssageRepository
     {
         DB::connection($this->connection)->table(self::TABLE_CONVERSATIONS)->raw(function ($collection) use ($conversationId, $messageId, $message) {
             return $collection->updateOne(
+                ['_id' => (int) $conversationId],
+                ['$set' => ['messages.$[msg].message' => $message]],
                 [
-                    '_id' => (int) $conversationId,
-                    'messages.id' => (int) $messageId,
-                    'messages.sender.id' => Auth::id(),
-                ],
-                [
-                    '$set' => [
-                        'messages.$.message' => $message,
+                    'arrayFilters' => [
+                        ['msg.id' => (int) $messageId, 'msg.sender.id' => Auth::id()],
                     ]
                 ]
             );
@@ -33,15 +30,18 @@ class MongoMesssageRepository implements MesssageRepository
     public function add($conversationId, $message): void
     {
         $messageId = $this->getMessageId($conversationId);
+
+        $message = [
+            'id' => $messageId + 1,
+            'message' => $message,
+            'sender' => [ 'id' => Auth::id(), 'name' => Auth::user()['name']],
+            'date' => (new Carbon())->format('Y-m-d H:i:s'),
+        ];
+
         DB::connection($this->connection)
             ->table(self::TABLE_CONVERSATIONS)
             ->where('_id', (int) $conversationId)
-            ->push('messages', [
-                'id' => $messageId + 1,
-                'message' => $message,
-                'sender' => [ 'id' => Auth::id(), 'name' => Auth::user()['name']],
-                'date' => (new Carbon())->format('Y-m-d H:i:s'),
-            ]);
+            ->push('messages', json_decode(json_encode($message)));
     }
     private function getMessageId(int $conversationId): int
     {

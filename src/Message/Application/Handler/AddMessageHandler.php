@@ -6,7 +6,6 @@ use Conversation\Application\Transformer\TransformerGetConversation;
 use Conversation\Domain\UseCase\GetConversationUseCase;
 use Illuminate\Http\JsonResponse;
 use Message\Domain\UseCase\AddMessageUseCase;
-use Message\Infrastructure\Entrypoint\Http\Request\AddMessageRequest;
 
 class AddMessageHandler
 {
@@ -16,7 +15,7 @@ class AddMessageHandler
         private readonly TransformerGetConversation $transformer,
     ){    }
 
-    public function handle(AddMessageRequest $request, $conversationId): JsonResponse
+    public function handle($request, $conversationId): JsonResponse
     {
         $this->addMessage->execute($conversationId, $request['message']);
         return $this->transformer->transform($this->getConversation->execute($conversationId));

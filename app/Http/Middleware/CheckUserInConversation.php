@@ -17,7 +17,7 @@ class CheckUserInConversation
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $conversationId = $request->route('conversationId');
+        $conversationId = $request->route('id');
 
         $isParticipant = (new CheckParticipantConversation(
             new MongoCheckParticipantConversationRepository()

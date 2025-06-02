@@ -49,7 +49,7 @@ class  MongoConversationRepository implements ConversationRepository
         return new ConversationDetails(
             $item['_id'],
             $item['group'],
-            (array)$item['details_group'] ?? null,
+            (array) ($item['details_group'] ?? []),
             $item['date_created'],
             (array)$item['participants']
         );

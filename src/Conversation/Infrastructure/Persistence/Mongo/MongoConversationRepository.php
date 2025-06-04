@@ -24,13 +24,12 @@ class  MongoConversationRepository implements ConversationRepository
     }
     private function createConversation($item): Conversation
     {
-        $receiver = $item->group ? $item->details_group : $item->participants;
-
         return new Conversation(
             $item->id,
             new Messages($item->messages),
             $item->group,
-            $receiver,
+            $item->details_group ?? null,
+            $item->participants,
         );
     }
 

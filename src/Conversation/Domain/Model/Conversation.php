@@ -11,7 +11,8 @@ class Conversation
         private readonly int $id,
         private readonly Messages $messages,
         private readonly bool $isGroup,
-        private readonly array $receiver,
+        private readonly ?array $detailsGroup,
+        private readonly array $participants,
     ){    }
 
     public function messages(): array
@@ -22,6 +23,7 @@ class Conversation
     {
         return [
             'id' => $this->id,
+            'sender' => $this->sender(),
             'receiver' => $this->receiver(),
             'messages' => $this->messages->toArray()
         ];
@@ -29,10 +31,15 @@ class Conversation
     public function receiver(): string
     {
         if($this->isGroup){
-            return $this->receiver['name'];
+            return $this->detailsGroup['name'];
         }
 
-        $receiver = array_values(array_filter($this->receiver, fn ($participant) => $participant['id'] !== Auth::id()));
+        $receiver = array_values(array_filter($this->participants, fn ($participant) => $participant['id'] !== Auth::id()));
         return $receiver[0]['name'];
+    }
+    public function sender(): array
+    {
+        $sender = array_values(array_filter($this->participants, fn ($participant) => $participant['id'] === Auth::id()));
+        return $sender[0];
     }
 }

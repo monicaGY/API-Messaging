@@ -66,6 +66,13 @@ docker-compose exec app composer install
 docker-compose exec app php artisan key:generate
 ```
 
+**Permission Issues**
+```bash
+# Fix storage permissions
+docker-compose exec app chown -R www-data:www-data storage
+docker-compose exec app chmod -R 775 storage
+```
+
 
 ### 4. Database Setup
 
@@ -81,8 +88,8 @@ docker-compose exec app php artisan db:seed
 
 | Service | Port                    |
 |---------|-------------------------|
-| API | `http://localhost:8080` |
-| Documentation | `http://localhost:8080/api/documentation` |
+| API | `http://localhost:8000` |
+| Documentation | `http://localhost:8000/api/documentation` |
 
 ### 5. API Messaging - login
 You can use the following test accounts to authenticate and interact with the API during development:

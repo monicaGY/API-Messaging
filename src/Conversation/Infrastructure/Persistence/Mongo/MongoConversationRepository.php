@@ -18,15 +18,19 @@ class  MongoConversationRepository implements ConversationRepository
     {
         return DB::connection($this->connection)
             ->table(self::TABLE_CONVERSATION)
-            ->select('_id', 'messages')
+            ->select('_id', 'messages', 'details_group', 'group', 'participants')
             ->where('_id', $id)
             ->get()->map(fn ($item) => $this->createConversation($item));
     }
     private function createConversation($item): Conversation
     {
+        $receiver = $item->group ? $item->details_group : $item->participants;
+
         return new Conversation(
             $item->id,
-            new Messages($item->messages)
+            new Messages($item->messages),
+            $item->group,
+            $receiver,
         );
     }
 
